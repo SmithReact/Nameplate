@@ -13,6 +13,12 @@ Nameplate is a plugin for [Ashita v4](https://github.com/AshitaXI/Ashita-v4beta)
 
 With this plugin, nameplates will be less blurry and the same size regardless of window size: no more stretched nameplates or having to download hacked DAT files.
 
+## Before and after
+
+| Before: stretched and blurry | After: corrected proportions |
+| --- | --- |
+| ![A stretched FFXI character nameplate before loading Nameplate](docs/images/nameplate-before.png) | ![The same FFXI character nameplate with corrected proportions after loading Nameplate](docs/images/nameplate-after.png) |
+
 ## Installation for Ashita v4 users
 
 If you're already using Ashita v4, you likely already know how to do this.

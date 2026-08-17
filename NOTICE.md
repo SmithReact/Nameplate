@@ -12,5 +12,11 @@ interfaces, replaces the module-based signature scanner, and adds a
 reproducible 32-bit MSVC build.
 
 The original copyright and GPL notices are retained. All port modifications
-and the combined work are distributed under GPL-3.0. No Square Enix game
-files or Ashita SDK files are included.
+and the combined source code are distributed under GPL-3.0. No Square Enix
+game-client files or Ashita SDK files are included.
+
+The before-and-after screenshots under `docs/images` contain in-game FINAL
+FANTASY XI imagery and are included only to document the plugin's visual
+effect. Those screenshots are not offered under GPL-3.0. FINAL FANTASY XI and
+its game imagery are owned by Square Enix; this project is not affiliated with
+or endorsed by Square Enix.
