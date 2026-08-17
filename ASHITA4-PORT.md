@@ -37,7 +37,10 @@ Configuration is stored in `Ashita\config\nameplate\defaults.ini`.
 /nameplate load
 /nameplate save
 /nameplate fontsize <1-256>
+/nameplate fontsizeinpx <1-256>
 /nameplate damagefontsize <1-256>
+/nameplate damagefontsizeinpx <1-256>
+/nameplate dmgfontsize <1-256>
 /nameplate hidestars
 /nameplate showstars
 /nameplate mode all
@@ -48,6 +51,10 @@ Configuration is stored in `Ashita\config\nameplate\defaults.ini`.
 /nameplate mode hidenpc
 /nameplate mode hidenpcself
 ```
+
+Commands are case-insensitive and may begin with `/nameplate` or
+`//nameplate`. Setting changes apply immediately but are not persisted until
+`/nameplate save` is run.
 
 ## Port changes
 

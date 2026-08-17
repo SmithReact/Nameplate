@@ -41,25 +41,36 @@ Job Mastery stars can be hidden by setting `HideStars=1` in the configuration.
 
 Nameplate visibility modes can be changed via the `NameMode` setting.
 
-The configuration file is not autosaved when changing these settings in-game. The configuration
-file can be saved and loaded by using the `/nameplate save` and `/nameplate load` commands.
+Changes apply immediately but are not autosaved. Run `/nameplate save` to
+persist them to `config\nameplate\defaults.ini`; `/nameplate load` discards
+unsaved changes and reloads that file.
 
-| command                              | description                                                                        |
-|--------------------------------------|------------------------------------------------------------------------------------|
-| /nameplate help                      | You're reading it!                                                                 |
-| /nameplate load                      | Load configuration from `config\nameplate\defaults.ini`                            |
-| /nameplate save                      | Save current configuration to `config\nameplate\defaults.ini`                      |
-| /nameplate fontsize `<number>`       | Set the nameplate font size to `<number>` pixels                                   |
-| /nameplate damagefontsize `<number>` | Set the damage font size to `<number>` pixels                                      |
-| /nameplate hidestars                 | Hide all Job Mastery stars                                                         |
-| /nameplate showstars                 | Re-enable displaying Job Mastery stars                                             |
-| /nameplate mode all                  | Show all nameplates                                                                |
-| /nameplate mode none                 | Hide all nameplates                                                                |
-| /nameplate mode hideself             | Hide your own nameplate                                                            |
-| /nameplate mode hidepc               | Hide all player nameplates, except when charmed                                    |
-| /nameplate mode hidepcself           | Hide all player nameplates, except when charmed, but also always keep yours hidden |
-| /nameplate mode hidenpc              | Hide all non-player nameplates                                                     |
-| /nameplate mode hidenpcself          | Hide all non-player nameplates, but also always keep yours hidden                  |
+### Complete Ashita command reference
+
+| Command | Description |
+| --- | --- |
+| `/load Nameplate` | Load the plugin through Ashita. |
+| `/unload Nameplate` | Unload the plugin and restore the patched game bytes. |
+| `/nameplate help` | Show the in-game command reference. |
+| `/nameplate load` | Reload `config\nameplate\defaults.ini`. |
+| `/nameplate save` | Save the current settings to `config\nameplate\defaults.ini`. |
+| `/nameplate fontsize <1-256>` | Set the nameplate font size in pixels. |
+| `/nameplate fontsizeinpx <1-256>` | Alias of `fontsize`. |
+| `/nameplate damagefontsize <1-256>` | Set the damage-number font size in pixels. |
+| `/nameplate damagefontsizeinpx <1-256>` | Alias of `damagefontsize`. |
+| `/nameplate dmgfontsize <1-256>` | Short alias of `damagefontsize`. |
+| `/nameplate hidestars` | Hide Job Mastery stars. |
+| `/nameplate showstars` | Show Job Mastery stars. |
+| `/nameplate mode all` | Show every nameplate. |
+| `/nameplate mode none` | Hide every nameplate. |
+| `/nameplate mode hideself` | Hide only your own nameplate. |
+| `/nameplate mode hidepc` | Hide player nameplates except charmed players; keep yours visible. |
+| `/nameplate mode hidepcself` | Hide player nameplates except charmed players, and hide yours. |
+| `/nameplate mode hidenpc` | Hide non-player nameplates; keep yours visible. |
+| `/nameplate mode hidenpcself` | Hide non-player nameplates and hide yours. |
+
+Plugin commands are case-insensitive. The parser accepts both `/nameplate`
+and `//nameplate`; the single-slash Ashita form shown above is recommended.
 
 ## Installation for Windower 4 users
 
