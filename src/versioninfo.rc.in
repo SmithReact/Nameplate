@@ -12,7 +12,7 @@ BEGIN
         BLOCK "040904E4"
         BEGIN
             VALUE "CompanyName", "BunnyBox Productions"
-            VALUE "FileDescription", "https://www.github.com/Shirk/Nameplate - Corrects defects in nameplate rendering"
+            VALUE "FileDescription", "https://github.com/SmithReact/Nameplate - Ashita 4.30 port"
             VALUE "FileVersion","0.5.1.0\0"
             VALUE "InternalName", "Nameplate"
             VALUE "LegalCopyright", "Copyright (c) 2024 BunnyBox Productions"

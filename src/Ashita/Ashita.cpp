@@ -12,6 +12,9 @@ You should have received a copy of the GNU General Public License along with Nam
 If not, see <https://www.gnu.org/licenses/>.
 */
 
+// Modified for Ashita interface 4.30 on 2026-08-16.
+// See ASHITA4-PORT.md and NOTICE.md for the port history.
+
 #include <windows.h>
 #include <strsafe.h>
 
@@ -48,7 +51,12 @@ public:
     virtual void Release(void) override;
 
     virtual void Debug(const char* text) override {
-        m_AshitaCore->GetChatManager()->Write(0, false, text);
+        if (m_LogManager != nullptr) {
+            m_LogManager->Logf(LogLevel_Info, "Nameplate", "%s", text);
+        }
+        if (m_AshitaCore != nullptr) {
+            m_AshitaCore->GetChatManager()->Write(0, false, text);
+        }
     }
 
     virtual bool GetConfigPath(wchar_t path[UNICODE_MAX_PATH]) override {
@@ -79,7 +87,7 @@ const char* AshitaNameplate::GetDescription(void) const {
 }
 
 const char* AshitaNameplate::GetLink(void) const {
-    return "https://www.github.com/Shirk/Nameplate";
+    return "https://github.com/SmithReact/Nameplate";
 }
 
 double AshitaNameplate::GetVersion(void) const {
@@ -144,7 +152,7 @@ static void AshitaShortHelp(IChatManager* chat, [[maybe_unused]] MESSAGE message
 
 static void AshitaLongHelp(IChatManager* chat, [[maybe_unused]] MESSAGE message, [[maybe_unused]] int param) {
     chat->Write(0, false, "\x1e\x05Nameplate v0.51");
-    chat->Write(0, false, "\x1e\x05https://www.github.com/Shirk/Nameplate");
+    chat->Write(0, false, "\x1e\x05https://github.com/SmithReact/Nameplate");
     chat->Write(0, false, "\x1e\x6aUsage:");
     chat->Write(0, false, "\x1e\x6a/nameplate help");
     chat->Write(0, true , "You're reading it!");
@@ -242,4 +250,8 @@ DllExport double __stdcall expGetInterfaceVersion(void) {
 
 DllExport IPlugin* __stdcall expCreatePlugin([[maybe_unused]] const char* args) {
     return new AshitaNameplate();
+}
+
+DllExport void __stdcall expDestroyPlugin(void* instance) {
+    delete static_cast<AshitaNameplate*>(instance);
 }

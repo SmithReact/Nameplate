@@ -1,6 +1,8 @@
 **/Debug
 **/Release
 /build
+/build-manual
+/release
 /.cache
 /.vs
 /.vscode

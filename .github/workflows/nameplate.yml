@@ -1,82 +1,41 @@
-name: Build and Release Nameplate.dll
+name: Build Ashita 4 port
 
 on:
+  push:
+    branches: [ashita4-port]
+  pull_request:
+    branches: [ashita4-port]
   workflow_dispatch:
-    inputs:
-      version:
-        description: "Version tag for this release"
-        required: true
-        type: string
 
 permissions:
-  contents: write
-  actions: read
+  contents: read
 
 jobs:
   build:
     runs-on: windows-latest
-    environment: release-environment
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out Nameplate
+        uses: actions/checkout@v4
 
-      # future: specify ashita version as a workflow input, then put api version in the zip filename.
-      - name: Setup Ashita v4 headers
+      - name: Check out Ashita 4.30 SDK
         uses: actions/checkout@v4
         with:
           repository: AshitaXI/Ashita-v4beta
-          path: ashita-sdk-416
-          ref: main
+          ref: 2e4b9c86de538ecfedabab918537c550d6378aaa
+          path: external/ashita
 
-      - name: Setup CMake
-        uses: lukka/get-cmake@latest
-        with:
-          ninjaVersion: latest
+      - name: Configure 32-bit release build
+        run: >-
+          cmake -S . -B build -A Win32
+          -DASHITA_SDK_PATH="${{ github.workspace }}/external/ashita/plugins/sdk"
+          -DNAMEPLATE_ENABLE_PATCHES=ON
 
-      - name: Setup Visual Studio
-        uses: microsoft/setup-msbuild@v2
+      - name: Build
+        run: cmake --build build --config Release
 
-      - name: Configure CMake with Clang
-        run: |
-          cmake -B build -G Ninja --no-warn-unused-cli `
-            -DCMAKE_C_COMPILER=clang `
-            -DCMAKE_C_COMPILER_FORCED=ON `
-            -DCMAKE_CXX_COMPILER=clang `
-            -DCMAKE_CXX_COMPILER_FORCED=ON `
-            -DCMAKE_BUILD_TYPE=Release `
-            -DASHITA_SDK_PATH=${{ github.workspace }}/ashita-sdk-416/plugins/sdk `
-            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-
-      - name: Build DLL
-        run: cmake --build build
-
-      - name: Build Package
-        run: |
-          mkdir -p release/docs/nameplate
-          mkdir -p release/plugins
-
-          cp CHANGELOG.md release/docs/nameplate/
-          cp README.md release/docs/nameplate/
-          cp build/Nameplate.dll release/plugins/
-
-          7z a -tzip -mx9 Nameplate-${{ inputs.version }}.zip ./release/*
-    
-      - name: Create Release
-        id: create_release
-        uses: softprops/action-gh-release@v1
-        if: true
-        with:
-          files: |
-            Nameplate-${{ inputs.version }}.zip
-          draft: false
-          prerelease: false
-          tag_name: ${{ inputs.version }}
-          name: Release ${{ inputs.version }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload Artifact
+      - name: Upload DLL
         uses: actions/upload-artifact@v4
         with:
-          name: Nameplate-${{ inputs.version }}
-          path: Nameplate-${{ inputs.version }}.zip
+          name: Nameplate-Ashita4.30
+          path: build/Release/Nameplate.dll

@@ -12,6 +12,8 @@ You should have received a copy of the GNU General Public License along with Nam
 If not, see <https://www.gnu.org/licenses/>.
 */
 
+// Modified for the Ashita 4.30 port on 2026-08-16.
+
 #ifndef BYTES__BYTES_H
 #define BYTES__BYTES_H
 
@@ -21,8 +23,9 @@ If not, see <https://www.gnu.org/licenses/>.
     union p {
         uint32_t i;
         float f;
-    };
-    return ((union p){ .i = i }).f;
+    } value = {};
+    value.i = i;
+    return value.f;
 }
 
 #define GET_VARARGS_MACRO3(_1, _2, _3, MACRO_NAME, ...) MACRO_NAME

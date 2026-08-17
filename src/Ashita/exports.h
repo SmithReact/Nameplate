@@ -12,6 +12,8 @@ You should have received a copy of the GNU General Public License along with Nam
 If not, see <https://www.gnu.org/licenses/>.
 */
 
+// Modified for Ashita interface 4.30 on 2026-08-16.
+
 #pragma once
 
 class IPlugin;
@@ -25,6 +27,8 @@ extern "C" {
 DllExport double __stdcall expGetInterfaceVersion(void);
 
 DllExport IPlugin* __stdcall expCreatePlugin(const char* args);
+
+DllExport void __stdcall expDestroyPlugin(void* instance);
 
 #ifdef __cplusplus
 };

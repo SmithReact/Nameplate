@@ -1,68 +1,58 @@
-cmake_minimum_required(VERSION 3.28)
+cmake_minimum_required(VERSION 3.22)
+
+cmake_policy(SET CMP0091 NEW)
 
 project(Nameplate
-    VERSION 0.51
+    VERSION 0.5.1.0
     LANGUAGES CXX
     DESCRIPTION "Corrects defects in nameplate rendering."
-    HOMEPAGE_URL "https://www.github.com/Shirk/Nameplate"
+    HOMEPAGE_URL "https://github.com/SmithReact/Nameplate"
 )
 
-# set(ASHITA_SDK_PATH "../Ashita v4 SDK 4.11/plugins/sdk" CACHE STRING "Ashita SDK Path")
-# set(ASHITA_SDK_PATH "../Ashita v4 SDK 4.14/plugins/sdk" CACHE STRING "Ashita SDK Path")
-# set(ASHITA_SDK_PATH "../Ashita v4 SDK 4.15/plugins/sdk" CACHE STRING "Ashita SDK Path")
-set(ASHITA_SDK_PATH "../Ashita v4 SDK 4.16/plugins/sdk" CACHE STRING "Ashita SDK Path")
+set(ASHITA_SDK_PATH "" CACHE PATH "Path to the current Ashita 4 plugins/sdk directory")
+option(NAMEPLATE_ENABLE_PATCHES "Enable validated FFXiMain code patches" OFF)
 
-set(CMAKE_C_STANDARD 17)
-set(CMAKE_C_STANDARD_REQUIRED True)
-set(CMAKE_C_EXTENSIONS OFF)
+if(NOT MSVC)
+    message(FATAL_ERROR "Nameplate must use the MSVC ABI expected by Ashita.")
+endif()
 
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+if(NOT CMAKE_SIZEOF_VOID_P EQUAL 4)
+    message(FATAL_ERROR "Nameplate must be configured with a 32-bit generator/toolchain.")
+endif()
+
+if(NOT EXISTS "${ASHITA_SDK_PATH}/Ashita.h")
+    message(FATAL_ERROR "Set ASHITA_SDK_PATH to the current Ashita 4 plugins/sdk directory.")
+endif()
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS True)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/versioninfo.rc.in versioninfo.rc COPYONLY)
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/versioninfo.rc.in versioninfo.rc @ONLY)
-
-add_library(Nameplate SHARED)
-
-target_sources(Nameplate PUBLIC
+add_library(Nameplate SHARED
     src/Nameplate.cpp
     src/Nameplate.h
-
+    src/findsignature.h
+    src/bytes/bytes.h
     src/Ashita/Ashita.cpp
     src/Ashita/exports.h
-
-    src/Windozer/Windozer.cpp
-    src/Windozer/Windozer.h
-
     src/exports.def
     "${CMAKE_CURRENT_BINARY_DIR}/versioninfo.rc"
+)
 
-    PUBLIC FILE_SET CXX_MODULES FILES
-    src/findsignature.cppm
-    )
+target_include_directories(Nameplate PRIVATE
+    "${ASHITA_SDK_PATH}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src"
+)
 
-target_include_directories(Nameplate PRIVATE ${ASHITA_SDK_PATH})
-target_compile_definitions(Nameplate PRIVATE WIN32_LEAN_AND_MEAN)
-set_property(TARGET Nameplate PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+target_compile_definitions(Nameplate PRIVATE
+    WIN32_LEAN_AND_MEAN
+    NAMEPLATE_ENABLE_PATCHES=$<BOOL:${NAMEPLATE_ENABLE_PATCHES}>
+)
 
-if(MSVC)
-    target_compile_options(Nameplate PRIVATE /EHa /W4)
-else()
-    target_compile_options(Nameplate PRIVATE
-        -m32
-        -fno-rtti -march=nehalem -fomit-frame-pointer -ffast-math -mfpmath=sse -mtune=skylake
-        -Wall -Wextra -Wpedantic -W
-        -Wno-c++98-compat -Wno-reserved-macro-identifier -Wno-nonportable-system-include-path
-        -Wno-reserved-identifier -Wno-gnu-anonymous-struct -Wno-nested-anon-types
-        -Wno-c++98-compat-pedantic -Wno-non-virtual-dtor -Wno-extra-semi -Wno-shadow-field
-        -Wno-old-style-cast -Wno-float-equal -Wno-documentation -Wno-microsoft-end-of-file
-        -Wno-sign-conversion -Wno-cast-align
-        -Wno-newline-eof -Wno-language-extension-token -Wno-cast-qual -Wno-extra-semi-stmt
-        -Wno-deprecated-copy-with-user-provided-dtor -Wno-missing-noreturn
-        -Wno-tautological-unsigned-zero-compare -Wno-duplicate-enum -Wno-double-promotion
-        -Wno-documentation-unknown-command -Wno-unused-function
-        -Wno-c99-extensions -Wno-missing-braces)
-    target_link_options(Nameplate PRIVATE -m32)
-endif()
+target_compile_options(Nameplate PRIVATE /EHa /permissive- /W4)
+target_link_libraries(Nameplate PRIVATE Psapi)
+
+set_property(TARGET Nameplate PROPERTY INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)

@@ -12,6 +12,9 @@ You should have received a copy of the GNU General Public License along with Nam
 If not, see <https://www.gnu.org/licenses/>.
 */
 
+// Modified for Ashita interface 4.30 on 2026-08-16.
+// See ASHITA4-PORT.md and NOTICE.md for the port history.
+
 #include <windows.h>
 #include <strsafe.h>
 #include <inttypes.h>
@@ -21,9 +24,15 @@ If not, see <https://www.gnu.org/licenses/>.
 
 #include "Nameplate.h"
 
-#include "bytes/bytes.h"
+#include "findsignature.h"
 
-import findsignature;
+#ifndef NAMEPLATE_ENABLE_PATCHES
+#define NAMEPLATE_ENABLE_PATCHES 0
+#endif
+
+#if NAMEPLATE_ENABLE_PATCHES
+#include "bytes/bytes.h"
+#endif
 
 // No copyright is claimed on the following "fair use for interoperability" section.
 /* Begin "fair use for interoperability" section */
@@ -40,23 +49,23 @@ import findsignature;
 #define DRAWDAMAGE_PATCH_LOCATION "A1????????8B88C80D0000E8????????8B5008A1????????8954240CDB44240CD84C2408D80D????????D95C24208B88C80D0000E8????????8B400C8B0D????????8944240C8BF1DB44240C8BD681E2FFFFFF00D84C240881FA80808000D80D????????D95C2424750E8B879401000081E6000000FF0BF0"
 /* End "fair use for interoperability" section */
 
-static constexpr auto getFrameDeltaSig = MakeSig<GETFRAMEDELTA>();
-static constexpr auto initApplicationDefaultsSig = MakeSig<INITAPPLICATIONDEFAULTS>();
-static constexpr auto getPlayerEntitySig = MakeSig<GETPLAYERENTITY>();
+static constexpr auto getFrameDeltaSig = MakeSig(GETFRAMEDELTA);
+static constexpr auto initApplicationDefaultsSig = MakeSig(INITAPPLICATIONDEFAULTS);
+static constexpr auto getPlayerEntitySig = MakeSig(GETPLAYERENTITY);
 
-static constexpr auto drawNamePatch0LocationSig = MakeSig<DRAWNAME_PATCH0_LOCATION>();
-static constexpr auto drawNamePatch1LocationSig = MakeSig<DRAWNAME_PATCH1_LOCATION>();
-static constexpr auto drawName2PatchLocationSig = MakeSig<DRAWNAME2_PATCH_LOCATION>();
-static constexpr auto drawName3PatchLocationSig = MakeSig<DRAWNAME3_PATCH_LOCATION>();
-static constexpr auto drawName3V2PatchLocationSig = MakeSig<DRAWNAME3_V2_PATCH_LOCATION>();
-static constexpr auto drawDamagePatchLocationSig = MakeSig<DRAWDAMAGE_PATCH_LOCATION>();
+static constexpr auto drawNamePatch0LocationSig = MakeSig(DRAWNAME_PATCH0_LOCATION);
+static constexpr auto drawNamePatch1LocationSig = MakeSig(DRAWNAME_PATCH1_LOCATION);
+static constexpr auto drawName2PatchLocationSig = MakeSig(DRAWNAME2_PATCH_LOCATION);
+static constexpr auto drawName3PatchLocationSig = MakeSig(DRAWNAME3_PATCH_LOCATION);
+static constexpr auto drawName3V2PatchLocationSig = MakeSig(DRAWNAME3_V2_PATCH_LOCATION);
+static constexpr auto drawDamagePatchLocationSig = MakeSig(DRAWDAMAGE_PATCH_LOCATION);
 
-static constexpr size_t DRAWNAME_PATCH0_SIZE = __builtin_strlen(DRAWNAME_PATCH0_LOCATION) / 2;
-static constexpr size_t DRAWNAME_PATCH1_SIZE = __builtin_strlen(DRAWNAME_PATCH1_LOCATION) / 2;
-static constexpr size_t DRAWNAME2_PATCH_SIZE = __builtin_strlen(DRAWNAME2_PATCH_LOCATION) / 2;
-static constexpr size_t DRAWNAME3_PATCH_SIZE = __builtin_strlen(DRAWNAME3_PATCH_LOCATION) / 2;
-static constexpr size_t DRAWNAME3_V2_PATCH_SIZE = __builtin_strlen(DRAWNAME3_V2_PATCH_LOCATION) / 2;
-static constexpr size_t DRAWDAMAGE_PATCH_SIZE = __builtin_strlen(DRAWDAMAGE_PATCH_LOCATION) / 2;
+static constexpr size_t DRAWNAME_PATCH0_SIZE = (sizeof(DRAWNAME_PATCH0_LOCATION) - 1) / 2;
+static constexpr size_t DRAWNAME_PATCH1_SIZE = (sizeof(DRAWNAME_PATCH1_LOCATION) - 1) / 2;
+static constexpr size_t DRAWNAME2_PATCH_SIZE = (sizeof(DRAWNAME2_PATCH_LOCATION) - 1) / 2;
+static constexpr size_t DRAWNAME3_PATCH_SIZE = (sizeof(DRAWNAME3_PATCH_LOCATION) - 1) / 2;
+static constexpr size_t DRAWNAME3_V2_PATCH_SIZE = (sizeof(DRAWNAME3_V2_PATCH_LOCATION) - 1) / 2;
+static constexpr size_t DRAWDAMAGE_PATCH_SIZE = (sizeof(DRAWDAMAGE_PATCH_LOCATION) - 1) / 2;
 
 // Wish I could just #embed these...
 // See src/assembly for source code.
@@ -424,9 +433,9 @@ static bool eat_space_token_match_and_advance(const char*& cmd, const char* toke
 
 bool Nameplate::ParseCommand(const char* cmd, bool includesName) {
 	if (includesName) {
-		if (token_match_and_advance(cmd, "/nameplate", __builtin_strlen("/nameplate"))) {
+		if (token_match_and_advance(cmd, "/nameplate", sizeof("/nameplate") - 1)) {
 			// skip
-		} else if (token_match_and_advance(cmd, "//nameplate", __builtin_strlen("//nameplate"))) {
+		} else if (token_match_and_advance(cmd, "//nameplate", sizeof("//nameplate") - 1)) {
 			// skip
 		} else {
 			return false;
@@ -447,9 +456,9 @@ bool Nameplate::ParseCommand(const char* cmd, bool includesName) {
 
 	int ret = 0;
 
-	if (eat_space_token_match_and_advance(cmd, "help", __builtin_strlen("help"))) {
+	if (eat_space_token_match_and_advance(cmd, "help", sizeof("help") - 1)) {
 		ShowMessage(MESSAGE::LONG_HELP);
-	} else if (eat_space_token_match_and_advance(cmd, "load", __builtin_strlen("load"))) {
+	} else if (eat_space_token_match_and_advance(cmd, "load", sizeof("load") - 1)) {
 		if (eat_space_and_is_end(cmd)) {
 			ret = LoadSettings();
 			if (ret < 0) {
@@ -460,7 +469,7 @@ bool Nameplate::ParseCommand(const char* cmd, bool includesName) {
 		} else {
 			ShowMessage(MESSAGE::LOAD_COMMAND_ERROR);
 		}
-	} else if (eat_space_token_match_and_advance(cmd, "save", __builtin_strlen("save"))) {
+	} else if (eat_space_token_match_and_advance(cmd, "save", sizeof("save") - 1)) {
 		if (eat_space_and_is_end(cmd)) {
 			ret = SaveSettings();
 			if (ret < 0) {
@@ -469,8 +478,8 @@ bool Nameplate::ParseCommand(const char* cmd, bool includesName) {
 		} else {
 			ShowMessage(MESSAGE::SAVE_COMMAND_ERROR);
 		}
-	} else if (eat_space_token_match_and_advance(cmd, "fontsizeinpx", __builtin_strlen("fontsizeinpx"))
-			|| eat_space_token_match_and_advance(cmd, "fontsize", __builtin_strlen("fontsize"))) {
+	} else if (eat_space_token_match_and_advance(cmd, "fontsizeinpx", sizeof("fontsizeinpx") - 1)
+			|| eat_space_token_match_and_advance(cmd, "fontsize", sizeof("fontsize") - 1)) {
 		errno = 0;
 
 		char* cmd_end = const_cast<char*>(cmd);
@@ -486,9 +495,9 @@ bool Nameplate::ParseCommand(const char* cmd, bool includesName) {
 			Settings.Flush();
 			// update not necessary in this path
 		}
-	} else if (eat_space_token_match_and_advance(cmd, "damagefontsizeinpx", __builtin_strlen("damagefontsizeinpx"))
-			|| eat_space_token_match_and_advance(cmd, "damagefontsize", __builtin_strlen("damagefontsize"))
-			|| eat_space_token_match_and_advance(cmd, "dmgfontsize", __builtin_strlen("dmgfontsize"))) {
+	} else if (eat_space_token_match_and_advance(cmd, "damagefontsizeinpx", sizeof("damagefontsizeinpx") - 1)
+			|| eat_space_token_match_and_advance(cmd, "damagefontsize", sizeof("damagefontsize") - 1)
+			|| eat_space_token_match_and_advance(cmd, "dmgfontsize", sizeof("dmgfontsize") - 1)) {
 		errno = 0;
 
 		char* cmd_end = const_cast<char*>(cmd);
@@ -504,7 +513,7 @@ bool Nameplate::ParseCommand(const char* cmd, bool includesName) {
 			Settings.Flush();
 			// update not necessary in this path
 		}
-	} else if (eat_space_token_match_and_advance(cmd, "showstars", __builtin_strlen("showstars"))) {
+	} else if (eat_space_token_match_and_advance(cmd, "showstars", sizeof("showstars") - 1)) {
 		if (eat_space_and_is_end(cmd)) {
 			Settings.SetHideStars(0);
 			Settings.Flush();
@@ -512,7 +521,7 @@ bool Nameplate::ParseCommand(const char* cmd, bool includesName) {
 		} else {
 			ShowMessage(MESSAGE::SHOW_STARS_COMMAND_ERROR);
 		}
-	} else if (eat_space_token_match_and_advance(cmd, "hidestars", __builtin_strlen("hidestars"))) {
+	} else if (eat_space_token_match_and_advance(cmd, "hidestars", sizeof("hidestars") - 1)) {
 		if (eat_space_and_is_end(cmd)) {
 			Settings.SetHideStars(1);
 			Settings.Flush();
@@ -520,23 +529,23 @@ bool Nameplate::ParseCommand(const char* cmd, bool includesName) {
 		} else {
 			ShowMessage(MESSAGE::HIDE_STARS_COMMAND_ERROR);
 		}
-	} else if (eat_space_token_match_and_advance(cmd, "mode", __builtin_strlen("mode"))) {
+	} else if (eat_space_token_match_and_advance(cmd, "mode", sizeof("mode") - 1)) {
 		NAME_MODE NameMode = NAME_MODE::ALL;
 		bool cmdError = false;
 
-		if (eat_space_token_match_and_advance(cmd, "all", __builtin_strlen("all"))) {
+		if (eat_space_token_match_and_advance(cmd, "all", sizeof("all") - 1)) {
 			NameMode = NAME_MODE::ALL;
-		} else if (eat_space_token_match_and_advance(cmd, "none", __builtin_strlen("none"))) {
+		} else if (eat_space_token_match_and_advance(cmd, "none", sizeof("none") - 1)) {
 			NameMode = NAME_MODE::NONE;
-		} else if (eat_space_token_match_and_advance(cmd, "hideself", __builtin_strlen("hideself"))) {
+		} else if (eat_space_token_match_and_advance(cmd, "hideself", sizeof("hideself") - 1)) {
 			NameMode = NAME_MODE::HIDE_SELF;
-		} else if (eat_space_token_match_and_advance(cmd, "hidepc", __builtin_strlen("hidepc"))) {
+		} else if (eat_space_token_match_and_advance(cmd, "hidepc", sizeof("hidepc") - 1)) {
 			NameMode = NAME_MODE::HIDE_PC;
-		} else if (eat_space_token_match_and_advance(cmd, "hidepcself", __builtin_strlen("hidepcself"))) {
+		} else if (eat_space_token_match_and_advance(cmd, "hidepcself", sizeof("hidepcself") - 1)) {
 			NameMode = NAME_MODE::HIDE_PCSELF;
-		} else if (eat_space_token_match_and_advance(cmd, "hidenpc", __builtin_strlen("hidenpc"))) {
+		} else if (eat_space_token_match_and_advance(cmd, "hidenpc", sizeof("hidenpc") - 1)) {
 			NameMode = NAME_MODE::HIDE_NPC;
-		} else if (eat_space_token_match_and_advance(cmd, "hidenpcself", __builtin_strlen("hidenpcself"))) {
+		} else if (eat_space_token_match_and_advance(cmd, "hidenpcself", sizeof("hidenpcself") - 1)) {
 			NameMode = NAME_MODE::HIDE_NPCSELF;
 		} else {
 			cmdError = true;
@@ -562,12 +571,58 @@ void Nameplate::Debug(const wchar_t* text) {
 	Debug(buf);
 }
 
+static SignatureScanResult LogSignatureResult(Nameplate* plugin, const char* name, const Signature& signature) {
+	const SignatureScanResult result = signature.Scan();
+	char message[256];
+
+	if (result.Address == nullptr) {
+		StringCchPrintfA(message, _countof(message), "[Nameplate] signature %-24s matches=%Iu", name, result.Count);
+	} else {
+		const uintptr_t moduleBase = reinterpret_cast<uintptr_t>(GetModuleHandleW(L"FFXiMain.dll"));
+		const uintptr_t relativeAddress = reinterpret_cast<uintptr_t>(result.Address) - moduleBase;
+		StringCchPrintfA(message, _countof(message), "[Nameplate] signature %-24s matches=%Iu RVA=0x%08" PRIXPTR,
+			name, result.Count, relativeAddress);
+	}
+
+	plugin->Debug(message);
+	return result;
+}
+
 int Nameplate::Init() {
 	ZeroMemory(&Globals, sizeof(Globals));
 
 	// Configuration setup
 	Settings.Init();
 	LoadSettings();
+
+#if !NAMEPLATE_ENABLE_PATCHES
+	Debug("[Nameplate] Ashita 4.30 diagnostic build loaded; game-code patching is disabled.");
+
+	const SignatureScanResult getFrameDelta = LogSignatureResult(this, "GetFrameDelta", getFrameDeltaSig);
+	const SignatureScanResult initDefaults = LogSignatureResult(this, "InitApplicationDefaults", initApplicationDefaultsSig);
+	const SignatureScanResult getPlayerEntity = LogSignatureResult(this, "GetPlayerEntity", getPlayerEntitySig);
+	const SignatureScanResult drawName0 = LogSignatureResult(this, "DrawNamePatch0", drawNamePatch0LocationSig);
+	const SignatureScanResult drawName1 = LogSignatureResult(this, "DrawNamePatch1", drawNamePatch1LocationSig);
+	const SignatureScanResult drawName2 = LogSignatureResult(this, "DrawName2", drawName2PatchLocationSig);
+	const SignatureScanResult drawName3 = LogSignatureResult(this, "DrawName3", drawName3PatchLocationSig);
+	const SignatureScanResult drawName3V2 = LogSignatureResult(this, "DrawName3V2", drawName3V2PatchLocationSig);
+	const SignatureScanResult drawDamage = LogSignatureResult(this, "DrawDamage", drawDamagePatchLocationSig);
+
+	const bool patchSetReady =
+		getFrameDelta.Count == 1 &&
+		initDefaults.Count == 1 &&
+		getPlayerEntity.Count == 1 &&
+		drawName0.Count == 1 &&
+		drawName1.Count == 1 &&
+		drawName2.Count == 1 &&
+		(drawName3.Count == 1 || drawName3V2.Count == 1) &&
+		drawDamage.Count == 1;
+
+	Debug(patchSetReady
+		? "[Nameplate] signature set is viable; review addresses before enabling patches."
+		: "[Nameplate] signature set is incomplete or ambiguous; patches must be updated.");
+	return 0;
+#else
 
 	// GetFrameDelta
 	uintptr_t pGetFrameDelta = (uintptr_t) getFrameDeltaSig.Find();
@@ -737,7 +792,9 @@ int Nameplate::Init() {
 	Globals.DrawName3V2PatchAddr = pDrawName3V2Patch;
 	Globals.DrawDamagePatchAddr = pDrawDamagePatch;
 
+	Debug("[Nameplate] Ashita 4.30 port loaded; rendering patches are enabled.");
 	return 0;
+#endif
 }
 
 int Nameplate::Update() {

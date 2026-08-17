@@ -3,5 +3,4 @@ VERSION 0.51
 EXPORTS
     expGetInterfaceVersion
     expCreatePlugin
-    GetInterfaceVersion
-    CreateInstance
+    expDestroyPlugin

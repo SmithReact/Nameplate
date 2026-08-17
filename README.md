@@ -1,4 +1,13 @@
-# Nameplate
+# Nameplate for Ashita 4.30
+
+> Unofficial Ashita 4.30 port of
+> [Shirk/Nameplate](https://github.com/Shirk/Nameplate), based on upstream
+> `v0.5.1.0d`. The original project is archived; this fork preserves its
+> behavior while restoring compatibility with the current Ashita plugin API.
+
+[Download the latest tested build](https://github.com/SmithReact/Nameplate/releases/latest)
+or see [ASHITA4-PORT.md](ASHITA4-PORT.md) for compatibility, installation,
+and build details.
 
 Nameplate is a plugin for [Ashita v4](https://github.com/AshitaXI/Ashita-v4beta) and [Windower 4](https://www.windower.net/) that corrects XI's nameplate aspect ratio.
 
@@ -9,7 +18,7 @@ With this plugin, nameplates will be less blurry and the same size regardless of
 If you're already using Ashita v4, you likely already know how to do this.
 
 Make sure the plugin api version matches the Ashita 4 api version.
-This version of Nameplate requires ***Ashita 4 interface 4.16***.
+This port requires ***Ashita 4 interface 4.30*** and a 32-bit FFXI client.
 
 ## Usage for Ashita v4 users
 
@@ -93,14 +102,18 @@ file can be saved and loaded by using the `//nameplate save` and `//nameplate lo
 
 ## For more information
 
-- [Nameplate Homepage](https://www.github.com/Shirk/Nameplate)
-- [Issues Tracker](https://github.com/Shirk/Nameplate/issues)
+- [Ashita 4 port repository](https://github.com/SmithReact/Nameplate)
+- [Ashita 4 port issues](https://github.com/SmithReact/Nameplate/issues)
+- [Original archived project](https://github.com/Shirk/Nameplate)
 - [Previous Homepage](https://ffxi.somepage.org/Nameplate/)
 - [Changelog](./CHANGELOG.md)
 
 ## License
 
-Nameplate is available under the [GNU GENERAL PUBLIC LICENSE, Version 3](https://www.gnu.org/licenses/gpl-3.0.en.html) license. Please consult [LICENSE](./LICENSE.md) for more information.
+Nameplate is available under the [GNU General Public License, Version 3](https://www.gnu.org/licenses/gpl-3.0.en.html).
+The complete corresponding source for the distributed DLL is maintained in
+this repository. See [LICENSE.md](LICENSE.md), [NOTICE.md](NOTICE.md), and
+[ASHITA4-PORT.md](ASHITA4-PORT.md).
 
 ## Legal
 
