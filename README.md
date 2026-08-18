@@ -21,7 +21,10 @@ With this plugin, nameplates will be less blurry and the same size regardless of
 
 ## Installation for Ashita v4 users
 
-If you're already using Ashita v4, you likely already know how to do this.
+1. Download and extract the [latest tested build](https://github.com/SmithReact/Nameplate/releases/latest).
+2. Copy `Nameplate.dll` directly into Ashita's `plugins` directory. The final path must be `Ashita\plugins\Nameplate.dll`.
+3. Do **not** place the DLL inside a separate `Nameplate` subfolder.
+4. Start FFXI and run `/load Nameplate`.
 
 Make sure the plugin api version matches the Ashita 4 api version.
 This port requires ***Ashita 4 interface 4.30*** and a 32-bit FFXI client.
